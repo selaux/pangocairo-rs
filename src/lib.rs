@@ -5,120 +5,153 @@
 extern crate pangocairo_sys as ffi;
 extern crate cairo;
 extern crate pango;
+#[macro_use]
 extern crate glib;
 
 use glib::translate::*;
 
-//=========================================================================
-// PangoCairoFcFontMap
-//=========================================================================
-// pub fn pango_cairo_fc_font_map_get_type() -> GType;
+mod font_map;
 
+pub use font_map::FontMap;
 
-//=========================================================================
-// PangoCairoFont
-//=========================================================================
-// pub fn pango_cairo_font_get_type() -> GType;
-// pub fn pango_cairo_font_get_scaled_font(font: *mut PangoCairoFont) -> *mut cairo::cairo_scaled_font_t;
+//glib_wrapper! {
+//    pub struct FcFontMap(Object<ffi::PangoCairoFcFontMap>);
+//
+//    match fn {
+//        get_type => || ffi::pango_cairo_fc_font_map_get_type(),
+//    }
+//}
 
+//glib_wrapper! {
+//    pub struct Font(Object<ffi::PangoCairoFont>);
+//
+//    match fn {
+//        get_type => || ffi::pango_cairo_font_get_type(),
+//    }
+//}
 
-//=========================================================================
-// PangoCairoFontMap
-//=========================================================================
-// pub fn pango_cairo_font_map_get_type() -> GType;
+//impl Font {
+//    fn get_scaled_font(&self) -> cairo::ScaledFont;
+//}
 
-pub fn font_map_get_default() -> pango::FontMap {
-    unsafe { from_glib_full(ffi::pango_cairo_font_map_get_default()) }
+//pub struct ShapeRendererFunc(...);
+
+pub trait PangoFontMapExt {
+    fn new() -> pango::FontMap;
+    fn from_font_type(fonttype: cairo::FontType) -> pango::FontMap;
+    fn get_default() -> pango::FontMap;
 }
 
-pub fn font_map_new() -> pango::FontMap {
-    unsafe { from_glib_full(ffi::pango_cairo_font_map_new()) }
+impl PangoFontMapExt for pango::FontMap {
+    fn new() -> pango::FontMap {
+        unsafe { from_glib_full(ffi::pango_cairo_font_map_new()) }
+    }
+
+    fn from_font_type(fonttype: cairo::FontType) -> pango::FontMap {
+        unsafe { from_glib_full(ffi::pango_cairo_font_map_new_for_font_type(fonttype)) }
+    }
+
+    fn get_default() -> pango::FontMap {
+        unsafe { from_glib_full(ffi::pango_cairo_font_map_get_default()) }
+    }
 }
 
-pub fn font_map_new_for_font_type(fonttype: cairo::FontType) -> pango::FontMap {
-    unsafe { from_glib_full(ffi::pango_cairo_font_map_new_for_font_type(fonttype)) }
+
+pub trait PangoContextExt {
+    //fn get_font_options(&self) -> cairo::FontOptions;
+    fn set_font_options(&self, options: cairo::FontOptions);
+    fn get_resolution(&self) -> f64;
+    fn set_resolution(&self, dpi: f64);
+    // fn get_shape_renderer(&self, data: *mut gpointer) -> ShapeRendererFunc;
+    // fn set_shape_renderer(&self, func: ShapeRendererFunc, data: gpointer, dnotify: glib::GDestroyNotify);
 }
 
-// pub fn pango_cairo_font_map_create_context(fontmap: *mut PangoCairoFontMap) -> *mut pango::PangoContext;
-// pub fn pango_cairo_font_map_get_font_type(fontmap: *mut PangoCairoFontMap) -> cairo::enums::FontType;
-// pub fn pango_cairo_font_map_get_resolution(fontmap: *mut PangoCairoFontMap) -> c_double;
-// pub fn pango_cairo_font_map_set_default(fontmap: *mut PangoCairoFontMap);
-// pub fn pango_cairo_font_map_set_resolution(fontmap: *mut PangoCairoFontMap, dpi: c_double);
+impl PangoContextExt for pango::Context {
+    //fn get_font_options(&self) -> cairo::FontOptions {
+    //    let font_options: cairo::FontOptions = unsafe {
+    //        cairo::FontOptions::from_raw(ffi::pango_cairo_context_get_font_options(self.to_glib_none().0))
+    //    };
+    //    font_options.ensure_status();
+    //    font_options
+    //}
 
+    fn set_font_options(&self, options: cairo::FontOptions) {
+        unsafe {
+            ffi::pango_cairo_context_set_font_options(self.to_glib_none().0, options.get_ptr())
+        }
+    }
 
-//=========================================================================
-// Other functions
-//=========================================================================
-// pub fn pango_cairo_context_get_font_options(context: *mut pango::PangoContext)
-//     -> *const cairo::cairo_font_options_t;
+    fn get_resolution(&self) -> f64 {
+        unsafe { ffi::pango_cairo_context_get_resolution(self.to_glib_none().0) }
+    }
 
-pub fn context_get_resolution(context: &pango::Context) -> f64 {
-    unsafe { ffi::pango_cairo_context_get_resolution(context.to_glib_none().0) }
+    fn set_resolution(&self, dpi: f64) {
+        unsafe { ffi::pango_cairo_context_set_resolution(self.to_glib_none().0, dpi); }
+    }
+
+    // ffi::pango_cairo_context_get_shape_renderer
+    // ffi::pango_cairo_context_set_shape_renderer
 }
 
-// pub fn pango_cairo_context_get_shape_renderer(context: *mut pango::PangoContext, data: *mut gpointer)
-//     -> PangoCairoShapeRendererFunc;
 
-// pub fn pango_cairo_context_set_font_options(context: *mut pango::PangoContext,
-//                                             options: *const cairo::cairo_font_options_t);
-
-pub fn context_set_resolution(context: &pango::Context, dpi: f64) {
-    unsafe { ffi::pango_cairo_context_set_resolution(context.to_glib_none().0, dpi); }
+pub trait CairoContextExt {
+    fn create_pango_context(&self) -> pango::Context;
+    fn update_pango_context(&self, context: &pango::Context);
+    fn create_pango_layout(&self) -> pango::Layout;
+    fn show_pango_layout(&self, layout: &pango::Layout);
+    fn update_pango_layout(&self, layout: &pango::Layout);
+    fn pango_layout_path(&self, layout: &pango::Layout);
+    fn pango_layout_line_path(&self, line: &pango::LayoutLine);
+    fn show_pango_layout_line(&self, line: &pango::LayoutLine);
+    fn error_underline_path(&self, x: f64, y: f64, width: f64, height: f64);
+    fn show_error_underline(&self, x: f64, y: f64, width: f64, height: f64);
+    // fn show_glyph_item(&self, text: &str, glyph_item: /*unimplemented*/ pango::GlyphItem);
+    // fn glyph_string_path(&self, font: /*unimplemented*/ pango::Font, glyphs: pango::GlyphString);
+    // fn show_glyph_string(&self, font: /*unimplemented*/ pango::Font, glyphs: pango::GlyphString);
 }
 
-// pub fn pango_cairo_context_set_shape_renderer(context: *mut pango::PangoContext,
-//                                               func: PangoCairoShapeRendererFunc, data: gpointer,
-//                                               dnotify: glib::GDestroyNotify);
+impl CairoContextExt for cairo::Context {
+    fn create_pango_context(&self) -> pango::Context {
+        unsafe { from_glib_full(ffi::pango_cairo_create_context(self.to_glib_none().0)) }
+    }
 
-pub fn create_context(cr: &cairo::Context) -> pango::Context {
-    unsafe { from_glib_full(ffi::pango_cairo_create_context(cr.to_glib_none().0)) }
-}
+    fn update_pango_context(&self, context: &pango::Context) {
+        unsafe { ffi::pango_cairo_update_context(self.to_glib_none().0, context.to_glib_none().0); };
+    }
 
-pub fn create_layout(cr: &cairo::Context) -> pango::Layout {
-    unsafe { from_glib_full(ffi::pango_cairo_create_layout(cr.to_glib_none().0)) }
-}
+    fn create_pango_layout(&self) -> pango::Layout {
+        unsafe { from_glib_full(ffi::pango_cairo_create_layout(self.to_glib_none().0)) }
+    }
 
-pub fn error_underline_path(cr: &cairo::Context, x: f64, y: f64, width: f64, height: f64) {
-    unsafe { ffi::pango_cairo_error_underline_path(cr.to_glib_none().0, x, y, width, height); };
-}
+    fn show_pango_layout(&self, layout: &pango::Layout) {
+        unsafe { ffi::pango_cairo_show_layout(self.to_glib_none().0, layout.to_glib_none().0); };
+    }
 
-// pub fn pango_cairo_glyph_string_path(cr: *mut cairo::cairo_t, font: *mut pango::PangoFont,
-//                                      glyphs: *mut pango::PangoGlyphString);
+    fn update_pango_layout(&self, layout: &pango::Layout) {
+        unsafe { ffi::pango_cairo_update_layout(self.to_glib_none().0, layout.to_glib_none().0); };
+    }
 
-pub fn layout_line_path(cr: &cairo::Context, line: &pango::LayoutLine) {
-    unsafe { ffi::pango_cairo_layout_line_path(cr.to_glib_none().0, line.to_glib_none().0); };
-}
+    fn pango_layout_path(&self, layout: &pango::Layout) {
+        unsafe { ffi::pango_cairo_layout_path(self.to_glib_none().0, layout.to_glib_none().0); };
+    }
 
-pub fn layout_path(cr: &cairo::Context, layout: &pango::Layout) {
-    unsafe { ffi::pango_cairo_layout_path(cr.to_glib_none().0, layout.to_glib_none().0); };
-}
+    fn show_pango_layout_line(&self, line: &pango::LayoutLine) {
+        unsafe { ffi::pango_cairo_show_layout_line(self.to_glib_none().0, line.to_glib_none().0); };
+    }
 
-pub fn show_error_underline(cr: &cairo::Context, x: f64, y: f64, width: f64, height: f64) {
-    unsafe { ffi::pango_cairo_show_error_underline(cr.to_glib_none().0, x, y, width, height); };
-}
+    fn pango_layout_line_path(&self, line: &pango::LayoutLine) {
+        unsafe { ffi::pango_cairo_layout_line_path(self.to_glib_none().0, line.to_glib_none().0); };
+    }
 
-// pub fn pango_cairo_show_glyph_item(cr: &cairo::Context, text: &str, glyph_item: &pango::GlyphItem) {
-//     unsafe { ffi::pango_cairo_show_glyph_item(cr.to_glib_none().0, text.to_glib_none().0,
-//                                               glyph_item.to_glib_none().0); };
-// }
+    fn error_underline_path(&self, x: f64, y: f64, width: f64, height: f64) {
+        unsafe { ffi::pango_cairo_error_underline_path(self.to_glib_none().0, x, y, width, height); };
+    }
 
-// pub fn show_glyph_string(cr: &cairo::Context, font: &pango::Font, glyphs: &pango::GlyphString) {
-//     unsafe { ffi::pango_cairo_show_glyph_string(cr.to_glib_none().0, font.to_glib_none().0,
-//                                                 glyphs.to_glib_none().0); };
-// }
+    fn show_error_underline(&self, x: f64, y: f64, width: f64, height: f64) {
+        unsafe { ffi::pango_cairo_show_error_underline(self.to_glib_none().0, x, y, width, height); };
+    }
 
-pub fn show_layout(cr: &cairo::Context, layout: &pango::Layout) {
-    unsafe { ffi::pango_cairo_show_layout(cr.to_glib_none().0, layout.to_glib_none().0); };
-}
-
-pub fn show_layout_line(cr: &cairo::Context, line: &pango::LayoutLine) {
-    unsafe { ffi::pango_cairo_show_layout_line(cr.to_glib_none().0, line.to_glib_none().0); };
-}
-
-pub fn update_context(cr: &cairo::Context, context: &pango::Context) {
-    unsafe { ffi::pango_cairo_update_context(cr.to_glib_none().0, context.to_glib_none().0); };
-}
-
-pub fn update_layout(cr: &cairo::Context, layout: &pango::Layout) {
-    unsafe { ffi::pango_cairo_update_layout(cr.to_glib_none().0, layout.to_glib_none().0); };
+    // ffi::pango_cairo_show_glyph_item
+    // ffi::pango_cairo_glyph_string_path
+    // ffi::pango_cairo_show_glyph_string
 }
