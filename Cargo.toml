@@ -22,3 +22,6 @@ version = "0.1.2"
 
 [lib]
 name = "pangocairo"
+
+[dev-dependencies]
+gtk = "0.1"
