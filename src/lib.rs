@@ -58,7 +58,7 @@ impl PangoFontMapExt for pango::FontMap {
 
 
 pub trait PangoContextExt {
-    //fn get_font_options(&self) -> cairo::FontOptions;
+    fn get_font_options(&self) -> Option<cairo::FontOptions>;
     fn set_font_options(&self, options: cairo::FontOptions);
     fn get_resolution(&self) -> f64;
     fn set_resolution(&self, dpi: f64);
@@ -67,13 +67,11 @@ pub trait PangoContextExt {
 }
 
 impl PangoContextExt for pango::Context {
-    //fn get_font_options(&self) -> cairo::FontOptions {
-    //    let font_options: cairo::FontOptions = unsafe {
-    //        cairo::FontOptions::from_raw(ffi::pango_cairo_context_get_font_options(self.to_glib_none().0))
-    //    };
-    //    font_options.ensure_status();
-    //    font_options
-    //}
+    fn get_font_options(&self) -> Option<cairo::FontOptions> {
+        unsafe {
+            from_glib_none(ffi::pango_cairo_context_get_font_options(self.to_glib_none().0))
+        }
+    }
 
     fn set_font_options(&self, options: cairo::FontOptions) {
         unsafe {
