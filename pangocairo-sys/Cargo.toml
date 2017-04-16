@@ -12,13 +12,16 @@ build = "build.rs"
 libc = "0.2"
 
 [dependencies.cairo-sys-rs]
-version = "0.3.3"
+git = "https://github.com/gtk-rs/cairo"
+version = "0.3.2"
 
 [dependencies.pango-sys]
-version = "0.3.3"
+git = "https://github.com/gtk-rs/sys"
+version = "0.3.2"
 
 [dependencies.glib-sys]
-version = "0.3.3"
+git = "https://github.com/gtk-rs/sys"
+version = "0.3.2"
 
 [build-dependencies]
 pkg-config = "0.3.7"
