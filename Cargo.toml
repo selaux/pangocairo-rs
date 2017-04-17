@@ -1,6 +1,6 @@
 [package]
 name = "pangocairo"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Reizner Evgeniy <razrfalcon@gmail.com>"]
 description = "Rust bindings for the PangoCairo library"
 repository = "https://github.com/razrfalcon/pangocairo-rs"
