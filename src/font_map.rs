@@ -12,12 +12,6 @@ glib_wrapper! {
 }
 
 impl FontMap {
-    pub fn create_context(&self) -> Option<pango::Context> {
-        unsafe {
-            from_glib_full(ffi::pango_cairo_font_map_create_context(self.to_glib_none().0))
-        }
-    }
-
     pub fn get_font_type(&self) -> cairo::enums::FontType {
         unsafe {
             ffi::pango_cairo_font_map_get_font_type(self.to_glib_none().0)
