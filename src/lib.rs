@@ -36,26 +36,6 @@ pub use font_map::FontMap;
 
 //pub struct ShapeRendererFunc(...);
 
-pub trait PangoFontMapExt {
-    fn new() -> pango::FontMap;
-    fn from_font_type(fonttype: cairo::FontType) -> pango::FontMap;
-    fn get_default() -> pango::FontMap;
-}
-
-impl PangoFontMapExt for pango::FontMap {
-    fn new() -> pango::FontMap {
-        unsafe { from_glib_full(ffi::pango_cairo_font_map_new()) }
-    }
-
-    fn from_font_type(fonttype: cairo::FontType) -> pango::FontMap {
-        unsafe { from_glib_full(ffi::pango_cairo_font_map_new_for_font_type(fonttype)) }
-    }
-
-    fn get_default() -> pango::FontMap {
-        unsafe { from_glib_full(ffi::pango_cairo_font_map_get_default()) }
-    }
-}
-
 
 pub trait PangoContextExt {
     fn get_font_options(&self) -> Option<cairo::FontOptions>;
