@@ -5,6 +5,7 @@
 extern crate pangocairo_sys as ffi;
 extern crate cairo;
 extern crate pango;
+extern crate pango_sys;
 #[macro_use]
 extern crate glib;
 
