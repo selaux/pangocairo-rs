@@ -16,14 +16,6 @@ mod font_map;
 pub use font_map::FontMap;
 
 //glib_wrapper! {
-//    pub struct FcFontMap(Object<ffi::PangoCairoFcFontMap>);
-//
-//    match fn {
-//        get_type => || ffi::pango_cairo_fc_font_map_get_type(),
-//    }
-//}
-
-//glib_wrapper! {
 //    pub struct Font(Object<ffi::PangoCairoFont>);
 //
 //    match fn {

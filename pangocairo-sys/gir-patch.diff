@@ -1,0 +1,26 @@
+diff --git a/PangoCairo-1.0.gir b/PangoCairo-1.0.gir
+index de64ef0..4a565d5 100644
+--- a/PangoCairo-1.0.gir
++++ b/PangoCairo-1.0.gir
+@@ -25,7 +25,7 @@ and/or use gtk-doc annotations.  -->
+            glib:get-type="pango_cairo_fc_font_map_get_type">
+       <implements name="FontMap"/>
+       <field name="parent_instance" introspectable="0">
+-        <type c:type="PangoFcFontMap"/>
++        <type name="Pango.FontMap" c:type="PangoFontMap"/>
+       </field>
+       <field name="serial">
+         <type name="guint" c:type="guint"/>
+diff --git a/freetype2-2.0.gir b/freetype2-2.0.gir
+index ac74dc8..d93161a 100644
+--- a/freetype2-2.0.gir
++++ b/freetype2-2.0.gir
+@@ -9,7 +9,7 @@
+     <record name="Face" c:type="FT_Face"/>
+     <record name="Library" c:type="FT_Library"/>
+     <alias name="Int32" c:type="FT_Int32">
+-      <type name="int32"/>
++      <type name="Int32" c:type="gint32"/>
+     </alias>
+     <function name="library_version" c:identifier="FT_Library_Version">
+       <return-value transfer-ownership="none">
