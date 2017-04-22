@@ -14,20 +14,29 @@ glib_wrapper! {
 
 impl FontMap {
     pub fn new() -> FontMap {
-        unsafe { from_glib_full(ffi::pango_cairo_font_map_new() as *mut ffi::PangoCairoFontMap) }
+        unsafe {
+            from_glib_full(ffi::pango_cairo_font_map_new() as *mut ffi::PangoCairoFontMap)
+        }
     }
 
     pub fn from_font_type(fonttype: cairo::FontType) -> Option<FontMap> {
-        unsafe { from_glib_full(ffi::pango_cairo_font_map_new_for_font_type(fonttype) as *mut ffi::PangoCairoFontMap) }
+        unsafe {
+            from_glib_full(ffi::pango_cairo_font_map_new_for_font_type(fonttype)
+                           as *mut ffi::PangoCairoFontMap)
+        }
     }
 
-    //pub fn get_default() -> &'static FontMap {
-    //    unsafe { from_glib_none(ffi::pango_cairo_font_map_get_default() as *mut ffi::PangoCairoFontMap) }
-    //}
+    pub fn get_default() -> FontMap {
+        unsafe {
+            from_glib_none(ffi::pango_cairo_font_map_get_default() as *mut ffi::PangoCairoFontMap)
+        }
+    }
 
-    //pub fn set_default(fontmap: &FontMap) {
-    //    unsafe { pango_cairo_font_map_set_default(to_glib_none(fontmap).0) }
-    //}
+    pub fn set_default(fontmap: &FontMap) {
+        unsafe {
+            ffi::pango_cairo_font_map_set_default(fontmap.to_glib_none().0)
+        }
+    }
 
     pub fn get_font_type(&self) -> cairo::enums::FontType {
         unsafe {
@@ -36,10 +45,14 @@ impl FontMap {
     }
 
     pub fn get_resolution(&self) -> f64 {
-        unsafe { ffi::pango_cairo_font_map_get_resolution(self.to_glib_none().0) }
+        unsafe {
+            ffi::pango_cairo_font_map_get_resolution(self.to_glib_none().0)
+        }
     }
 
     pub fn set_resolution(&self, dpi: f64) {
-        unsafe { ffi::pango_cairo_font_map_set_resolution(self.to_glib_none().0, dpi) }
+        unsafe {
+            ffi::pango_cairo_font_map_set_resolution(self.to_glib_none().0, dpi)
+        }
     }
 }
