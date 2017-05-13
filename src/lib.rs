@@ -4,6 +4,7 @@
 
 extern crate pangocairo_sys as ffi;
 extern crate cairo;
+extern crate cairo_sys as cairo_ffi;
 extern crate pango;
 extern crate pango_sys;
 #[macro_use]
@@ -31,8 +32,8 @@ pub use font_map::FontMap;
 
 
 pub trait PangoContextExt {
-    fn get_font_options(&self) -> Option<cairo::FontOptions>;
-    fn set_font_options(&self, options: cairo::FontOptions);
+//    fn get_font_options(&self) -> cairo::FontOptions;
+//    fn set_font_options(&self, options: cairo::FontOptions);
     fn get_resolution(&self) -> f64;
     fn set_resolution(&self, dpi: f64);
     // fn get_shape_renderer(&self, data: *mut gpointer) -> ShapeRendererFunc;
@@ -40,17 +41,20 @@ pub trait PangoContextExt {
 }
 
 impl PangoContextExt for pango::Context {
-    fn get_font_options(&self) -> Option<cairo::FontOptions> {
-        unsafe {
-            from_glib_none(ffi::pango_cairo_context_get_font_options(self.to_glib_none().0))
-        }
-    }
-
-    fn set_font_options(&self, options: cairo::FontOptions) {
-        unsafe {
-            ffi::pango_cairo_context_set_font_options(self.to_glib_none().0, options.get_ptr())
-        }
-    }
+//    fn get_font_options(&self) -> cairo::FontOptions {
+//        unsafe {
+//            return cairo::FontOptions::from_raw_full(cairo_ffi::cairo_font_options_merge(
+//                cairo::FontOptions::new().to_raw_none(),
+//                ffi::pango_cairo_context_get_font_options(self.to_glib_none().0)
+//            ));
+//        }
+//    }
+//
+//    fn set_font_options(&self, options: cairo::FontOptions) {
+//        unsafe {
+//            ffi::pango_cairo_context_set_font_options(self.to_glib_none().0, options.get_ptr())
+//        }
+//    }
 
     fn get_resolution(&self) -> f64 {
         unsafe { ffi::pango_cairo_context_get_resolution(self.to_glib_none().0) }
